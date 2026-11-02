@@ -1,161 +1,84 @@
-name: Ex0 - GIT and VS
+image: alpine
 
-on:
-  push:
-    branches:
-      - main
+#####################################
+# gitlab-ci.yml for Ex0 - GIT & VS  #
+#####################################
 
-jobs:
+stages:
+  - perparation
+  - VSFilesCheck
+  - ExcludedFilesCheck
 
-  build-pipeline-tools:
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      ## Ignore building executable files that are already in cache ##
-          
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          path: |
-            filesverifier
-            valgrindverifier
-            clearscreen
-            printMessage
-            printbanner
-            CodesToMessages.csv
-          key: ${{ runner.os }}-test-files
-        
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true' 
-        run: |
-          sudo apt-get update
-          sudo apt-get install git golang-go gcc build-essential
-          
-      - name: Build utils
-        if: steps.cache.outputs.cache-hit != 'true' 
-        run: |
-          git clone https://gitlab.com/exercisetests/utils.git
-          cd utils
-          g++ clearscreen.cpp -o clearscreen
-          g++ printbanner.cpp -o printbanner 
-          g++ printMessage.cpp -o printMessage
-          chmod +x clearscreen
-          chmod +x printbanner
-          chmod +x printMessage
-          
-          mv clearscreen ..
-          mv printbanner ..
-          mv printMessage ..
-          mv CodesToMessages.csv ..
-          cd ..
-          
-      - name: Build files verifier
-        if: steps.cache.outputs.cache-hit != 'true' 
-        run: |  
-          git clone https://gitlab.com/exercisetests/verifysubmittedfiles.git
-          cd verifysubmittedfiles
-          go build .
-          chmod +x filesverifier
-          mv filesverifier ..
-          cd ..      
-  
-      - name: Clone exercise test repo
-        run: |
-          mkdir checkers
-          git clone https://gitlab.com/exercisetests/ex0files.git
-          cd ex0files
-          mv PreSubmissionChecker.txt ../checkers          
-          cd ..
-  
-      ## This step stores the executable files in cache ##
-      
-      - name: Cache compiled files
-        if: steps.cache.outputs.cache-hit != 'true' 
-        uses: actions/cache@v3
-        with:
-          path: |
-            filesverifier
-            valgrindverifier
-            clearscreen
-            printMessage
-            printbanner
-            CodesToMessages.csv
-          key: ${{ runner.os }}-test-files
-          
-      - uses: actions/upload-artifact@v3
-        with:
-          name: pipeline-tools
-          path: checkers            
-
-  verify-vs-files:
+Build test tools:
+  stage: perparation
+  before_script:
+    - apk update
+    - apk add git
+    - apk add go
+    - apk add build-base gcc abuild binutils
     
+  script:
 
-    needs: build-pipeline-tools  
-    runs-on: ubuntu-latest
+    # build utils
+    - git clone https://gitlab.com/exercisetests/utils.git
+    - cd utils
+    - g++ clearscreen.cpp -o clearscreen
+    - g++ printbanner.cpp -o printbanner
+    - g++ printMessage.cpp -o printMessage
+    
+    - mv clearscreen ..
+    - mv printbanner ..
+    - mv printMessage ..
+    - mv CodesToMessages.csv ..
+    - cd ..
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: Download artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: pipeline-tools
+    # build files verifier
+    - git clone https://gitlab.com/exercisetests/verifysubmittedfiles.git
+    - cd verifysubmittedfiles
+    - go build .
+    - mv filesverifier ..
+    - cd ..
 
-    - name: Restore cloned files
-      uses: actions/cache@v3
-      with:  
-        path: |
-          filesverifier
-          valgrindverifier
-          clearscreen
-          printMessage
-          printbanner
-          CodesToMessages.csv
-        key: ${{ runner.os }}-test-files 
-        restore-keys: |
-          ${{ runner.os }}-test-files 
-        
-    - name: Verify Vs files
-      run: |
-        ./clearscreen 50  
-        ./printbanner
-        echo "Verifying required VS files..."
-        ./filesverifier PreSubmissionChecker.txt 2
-        echo "Verifying required VS files..."
-  
-  verify-excluded-files:
-      needs: build-pipeline-tools  
-      runs-on: ubuntu-latest
-      steps:
-      - uses: actions/checkout@v3
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: pipeline-tools
+   # build exercise files tests
+    - git clone https://gitlab.com/magshimim2022ekronotex0/ex0files.git
+    - cd ex0files
+    - mv PreSubmissionChecker.txt ..
+    - cd ..
 
-      - name: Restore cloned files
-        uses: actions/cache@v3
-        with:  
-          path: |
-           filesverifier
-            valgrindverifier
-            clearscreen
-            printMessage
-            printbanner
-            CodesToMessages.csv
-          key: ${{ runner.os }}-test-files 
-          restore-keys: |
-            ${{ runner.os }}-test-files 
+  artifacts:
+    paths:
+      - filesverifier
+      - clearscreen
+      - printMessage
+      - CodesToMessages.csv
+      - printbanner
+      - PreSubmissionChecker.txt
 
-      - name: verify-excluded-files
-        run: |
-          ./clearscreen 50
-          ./printbanner
-          echo "Verifying files that should not be submitted..."
-          ./filesverifier PreSubmissionChecker.txt 4
-          echo "Excluded files ok"
+Verify Visual Studio Files:
+  stage: VSFilesCheck
+  needs:
+    - job: Build test tools
+  before_script:
+  - apk add git
+  - apk add build-base gcc abuild binutils
+  script:
+    - ./clearscreen 50
+    - ./printbanner
+    - echo "Verifying required VS files..."
+    - ./filesverifier PreSubmissionChecker.txt 2
+    - echo "Required VS files ok"
 
- 
- 
+Verify Excluded Files:
+  stage: ExcludedFilesCheck
+  needs:
+    - job: Build test tools
+    - job: Verify Visual Studio Files
+  before_script:
+  - apk add git
+  - apk add build-base gcc abuild binutils
+  script:
+    - ./clearscreen 50
+    - ./printbanner
+    - echo "Verifying files that should not be submitted..."
+    - ./filesverifier PreSubmissionChecker.txt 4
+    - echo "Excluded files ok"
