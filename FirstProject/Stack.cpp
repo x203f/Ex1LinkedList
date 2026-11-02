@@ -6,6 +6,7 @@ s: the stack
 element: the value
 */
 void push(Stack* s, unsigned int element) {
+	if (s == nullptr) return;
   	LinkedList* newNode = new LinkedList;
 
   	newNode->next = s->numbers;
@@ -20,20 +21,21 @@ s: the stack
 int pop(Stack* s) {
     if (isEmpty(s)) return 0;
 
-	  int node = s->numbers->value;
-	  LinkedList* temp = s->numbers->next;
+	int node = s->numbers->value;
+	LinkedList* temp = s->numbers->next;
 
-	  delete s->numbers;
+	delete s->numbers;
 
-	  s->numbers = temp;
+	s->numbers = temp;
 	
-	  return node;
+	return node;
 }
 /*
 This function will initialize the stack. the numbers is nullptr for the start
 s: the stack
 */
 void initStack(Stack* s) {
+	if (s == nullptr) return;
 	s->numbers = nullptr;
 
 }
@@ -43,6 +45,7 @@ This functioon will clean the stack.
 s: the stack
 */
 void cleanStack(Stack* s) {
+	  if (s == nullptr) return;
 	  LinkedList* pos = s->numbers;
 
 	  while (pos != nullptr) {
@@ -60,5 +63,5 @@ This function will check if the stack is empty
 s: the stack.
 */
 bool isEmpty(Stack* s) {
-	  return s->numbers == nullptr;
+	  return s == nullptr || s->numbers == nullptr;
 }
