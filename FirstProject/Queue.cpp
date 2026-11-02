@@ -1,4 +1,4 @@
-#include <iostream>
+
 #include "Queue.h"
 
 // Complexity: O(1) for bonus
@@ -9,12 +9,17 @@ q: The queue
 size: max size of the queue
 */
 void initQueue(Queue* q, unsigned int size) {
-	q->array = new int[size];
+
 	q->first = 0;
 	q->last = 0;
 	q->size = size;
 	q->count = 0;
-
+	if (size == 0) 
+	{
+		q->array = nullptr;
+	} else{
+		q->array = new int[size];
+	}
 }
 
 /*
@@ -24,7 +29,6 @@ newValue: a number to add
 
 */
 void enqueue(Queue* q, unsigned int newValue) {
-
 	if (isFull(q)) return;
 	if (q->array == nullptr) return;
 
@@ -58,6 +62,8 @@ This function will deallocate the queue completely. after the call the queue wil
 q: The queue
 */
 void cleanQueue(Queue* q) {
+
+	if (q == nullptr) return;
 	delete[] q->array;
 	q->array = nullptr;
 	q->count = 0;
@@ -72,7 +78,7 @@ This function will check if the queue is empty.
 s: the queue
 */
 bool isEmpty(Queue* s) {
-	return (s->array == nullptr || s->count == 0);
+	return (s == nullptr || s->array == nullptr || s->count == 0);
 }
 
 /*
@@ -80,5 +86,5 @@ This function will check if the queue is full
 s: the queue.
 */
 bool isFull(Queue* s) {
-	return (s->count == s->size);
+	return (s != nullptr && s->count == s->size);
 }
