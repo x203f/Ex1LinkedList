@@ -1,0 +1,18 @@
+##RequiredFiles
+Queue.h | queue.h -m1
+Queue.cpp | queue.cpp -m1
+LinkedList.h | linkedlist.h -m1 | linkedlist.h -m1
+LinkedList.cpp | linkedlist.cpp -m1 | linkedlist.cpp -m1
+Stack.h | stack.h -m1
+Stack.cpp | stack.cpp -m1
+Utils.h | utils.h -m1
+Utils.cpp | utils.cpp -m1
+main1.cpp
+main2.cpp
+
+
+##RequiredVS
+
+##Bonus
+
+##ExcludedFiles

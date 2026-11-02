@@ -1,0 +1,13 @@
+##RequiredFiles
+LinkedList.h | linkedlist.h -m1 | linkedList.h -m1| Linkedlist.h -m1
+LinkedList.cpp | linkedlist.cpp -m1 | linkedList.cpp -m1 | Linkedlist.cpp -m1
+Stack.h | stack.h -m1
+Stack.cpp | stack.cpp -m1
+Utils.h | utils.h -m1
+Utils.cpp | utils.cpp -m1
+
+##RequiredVS
+
+##Bonus
+
+##ExcludedFiles

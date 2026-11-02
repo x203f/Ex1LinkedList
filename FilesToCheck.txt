@@ -1,0 +1,21 @@
+##RequiredFiles
+Queue.h
+Queue.cpp
+LinkedList.h
+LinkedList.cpp
+Stack.h
+Stack.cpp
+Utils.h
+Utils.cpp
+
+##RequiredVS
+*[1].sln | *[1].slnx
+*[1].vcxproj
+*[1].vcxproj.filters
+
+##Bonus
+
+##ExcludedFiles
+*.vcxproj.user
+Debug
+.vs
