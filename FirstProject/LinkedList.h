@@ -1,11 +1,11 @@
-#include <iostream>
+
 
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
 
 typedef struct _LinkedList {
-	int value;
+	unsigned int value;
 	_LinkedList* next;
 } LinkedList;
 
